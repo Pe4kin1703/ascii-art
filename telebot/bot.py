@@ -4,6 +4,12 @@ from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton, message
+import PIL.Image as Image
+import io
+from io import BytesIO
+import os
+from base64 import b64encode as enc64
+from base64 import b64decode as dec64
 from config import TOKEN
 
 
@@ -30,9 +36,26 @@ async def process_help_command(message: types.Message):
 async def process_help_command(message: types.Message):
     await bot.send_message(message.chat.id, text="Later..", reply_markup=main_kb)
 
+@dp.message_handler(content_types=['photo'])
+async def process_get_photo(message: types.Message):
+    photo_name = str(message.message_id) + '.jpg'
+    await message.photo[-1].download(photo_name)
+    try:
+        with open(photo_name, "rb") as image:
+            binary = enc64(image.read()) #encoding image to base64
+            os.remove(photo_name)
+            await bot.send_message(message.chat.id, text="I've converted this image to Base64")
+            img = BytesIO(dec64(binary)) #decoding image from base64
+            img.name = "image.jpeg"
+            img.seek(0)
+            await bot.send_photo(chat_id=message.chat.id, photo=img, caption="Decoded image") #sending image
+    except:
+        await bot.send_message(message.chat.id, text="Error while converting or decoding")
+        return
+
 @dp.message_handler()
-async def echo_message(msg: types.Message):
-    await bot.send_message(msg.chat.id, text=msg.text, reply_markup=main_kb)
+async def echo_message(message: types.Message):
+    await bot.send_message(message.chat.id, text=message.text, reply_markup=main_kb)
 
 if __name__ == '__main__':
     executor.start_polling(dp)
