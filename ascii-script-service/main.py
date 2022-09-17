@@ -12,7 +12,7 @@ import pika
 # ASCII_GRADIENT = ["Ñ" ,"@", "#", "W", "$", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0", "?", "!", "a", "b", "c", ";", ":", "+", "="," -", ",", ".","_", " "]
 ASXII_CHARS = ["@", "#", "S", "%", "?", "*", "+", ";", ":", ",", ".", " "]
 
-new_width = 200
+new_width = 500
 
 def resize_image(image):
     width, height = image.size
@@ -106,6 +106,7 @@ if __name__ == '__main__':
     channel.queue_declare(queue='rpc_queue')
 
     channel.basic_consume(queue='rpc_queue', on_message_callback=on_request)
+    # channel.basic_consume(queue='rpc_queue', on_message_callback=on_request)
 
     print(" [x] Awaiting RPC requests")
     channel.start_consuming()

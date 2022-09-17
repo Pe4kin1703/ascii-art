@@ -70,8 +70,7 @@ with open(image_path, 'rb') as file:
 ascii_rpc = AsciiRpcClient()
 
 
-handler():
-    ascii_rpc.call(image_path, b)//async
+
 response = ascii_rpc.call(image_path, b)
 
 print("Response:")
