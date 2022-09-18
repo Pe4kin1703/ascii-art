@@ -2,7 +2,9 @@ import socket
 import pika
 import uuid
 import argparse
+import ascii_storage
 import base64
+
 
 class AsciiRpcClient(object):
 
