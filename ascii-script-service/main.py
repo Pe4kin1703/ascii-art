@@ -2,6 +2,7 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import time
 
 from PIL import Image
 import numpy as np
@@ -50,20 +51,28 @@ def get_image_from_socket():
     file.close()
     client_sock.close()
 
-def do_stuff(image_bytes: bytes):
+def do_stuff(image_name:str):
     """
     Needed to do all job and return text file in byte type
     :param image_bytes:
     :return:
     """
-    print("Do stuff started")
-    with open('file.jpg', 'wb') as binary_file:
-        binary_file.write(image_bytes)
+    # print("Do stuff started")
+    # with open('file.jpg', 'wb') as binary_file:
+    #     binary_file.write(image_bytes)
 
-    image = Image.open('file.jpg').convert('L')
+    working_directory = image_name[:image_name.rfind('/')]
+    photo_name = image_name[image_name.rfind('/')+1:image_name.rfind('.')]
+    print(f"{working_directory=}")
+    print(f"{photo_name=}")
+
+    image = Image.open(image_name).convert('L')
     image_string = image_to_ascii(resize_image(image))
     pixels = len(image_string)
     ascii_image = "\n".join(image_string[i:(i+new_width)] for i in range(0, pixels, new_width))
+
+    text_file = working_directory + '/' + photo_name + '.txt'
+    print(f"{text_file=}")
 
     print("Printing ascii image:")
     print(ascii_image)
@@ -81,9 +90,11 @@ def do_stuff(image_bytes: bytes):
 def on_request(ch, method, props, body):
     print("on_request begin")
     print(f"Working on request with {props.correlation_id=}")
-    image_bytes = body
+    image_name_binary = body
 
-    response = do_stuff(image_bytes)
+    response = do_stuff(image_name_binary.decode('utf-8'))
+
+    # time.sleep(60)
 
     ch.basic_publish(
         exchange='',
