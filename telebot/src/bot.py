@@ -1,6 +1,5 @@
 import uuid
 import pika
-
 import logging
 import logging.config
 
@@ -20,6 +19,8 @@ from config import TOKEN
 
 # import ascii-storage
 
+help_message = "Hi!👋 I\'m ASCII-Art bot. You can send me any image and I\'ll create an ASCII Art.\nℹ️For other information press buttons below"
+greetings_message = "Hi!👋 I\'m ASCII-Art bot. You can send me any image and I\'ll create an ASCII Art.\nℹ️For other information press \"Help\" button "
 class AsciiRpcClient(object):
 
     def __init__(self):
@@ -32,7 +33,7 @@ class AsciiRpcClient(object):
         self.callback_queue = result.method.queue
 
         self.channel.basic_consume(queue=self.callback_queue,
-                                   on_message_callback=self.on_response)
+                                    on_message_callback=self.on_response)
         self.response = None
         self.correlation_id = None
 
@@ -64,7 +65,7 @@ class AsciiRpcClient(object):
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-button_help = KeyboardButton('Help')
+button_help = KeyboardButton('**Help**ℹ️')
 button_send = KeyboardButton('Send photo')
 
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -72,21 +73,22 @@ main_kb.row(button_help, button_send)
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    await message.reply("Echo bot", reply_markup=main_kb)
+    await message.reply("Ascii Art Bot", reply_markup=main_kb)
 
-@dp.message_handler(lambda message: message.text == 'Help')
+@dp.message_handler(lambda message: message.text == '**Help**ℹ️')
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    await bot.send_message(message.chat.id, text="I\'ll repeat everything you say", reply_markup=main_kb)
+    await bot.send_message(message.chat.id, text=help_message, reply_markup=main_kb)
 
 @dp.message_handler(lambda message: message.text == 'Send photo')
 @dp.message_handler(commands=['send'])
-async def process_help_command(message: types.Message):
+async def process_photo_command(message: types.Message):
     await bot.send_message(message.chat.id, text="Later..", reply_markup=main_kb)
 
 @dp.message_handler(content_types=['photo'])
 async def process_get_photo(message: types.Message):
-
+    await bot.send_message(message.chat.id, text="Бот прийняв Іслам. Діма поки грається з ним, тому ascii артов не буде)()(()))", reply_markup=main_kb)
+    return
     photo_name = '/home/dspitsyn/ascii-db/'+ str(message.chat.username)+'/'+ str(message.message_id) + '.jpg'
     # logger.warning(f"{photo_name=}")
     await message.photo[-1].download(photo_name)
@@ -108,9 +110,9 @@ async def process_get_photo(message: types.Message):
     #     await bot.send_message(message.chat.id, text="Error while converting or decoding")
     #     return
 
-# @dp.message_handler()
-# async def echo_message(message: types.Message):
-#     await bot.send_message(message.chat.id, text=message.text, reply_markup=main_kb)
+@dp.message_handler()
+async def echo_message(message: types.Message):
+    await bot.send_message(message.chat.id, text="Бот прийняв Іслам. Діма поки грається з ним, тому ascii артов не буде)()(()))", reply_markup=main_kb)
 
 if __name__ == '__main__':
     logging.config.fileConfig(fname='logger.conf', disable_existing_loggers=False)
