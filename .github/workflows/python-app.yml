@@ -37,7 +37,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: pylint
       run: |
-        pylint ascii-script-service/main.py
-        pylint ascii-script-service/client.py
-        pylint telebot/bot.py
+        python3 lint.py
         
