@@ -74,14 +74,13 @@ def do_stuff(image_name:str):
     text_file = working_directory + '/' + photo_name + '.txt'
     print(f"{text_file=}")
 
+    with open(text_file, 'w') as f:
+        f.write(ascii_image)
+
     print("Printing ascii image:")
     print(ascii_image)
     # print(len(image.getdata()))
-    with open("rpc.txt", "w") as f:
-        f.write(ascii_image)
 
-    with  open("rpc.txt", 'rb') as f:
-        binary_file = f.read()
     return ascii_image
 
 
