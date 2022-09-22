@@ -18,51 +18,38 @@ from base64 import b64encode as enc64
 from base64 import b64decode as dec64
 from config import TOKEN
 
+from ImageMgr import ImageManager
+from AsciiRpcClient import AsciiRpcClient
+
 # import ascii-storage
 
-class AsciiRpcClient(object):
-
+class TgServer:
     def __init__(self):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost')
-        )
-        self.channel = self.connection.channel()
+        self.ascii_client = AsciiRpcClient()
+        # self.accoun_client = AccountClient()
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
-        self.callback_queue = result.method.queue
+        
 
-        self.channel.basic_consume(queue=self.callback_queue,
-                                   on_message_callback=self.on_response)
-        self.response = None
-        self.correlation_id = None
+    def start(self, dp: Dispatcher):
+        self.ascii_client.start()
 
-    def on_response(self, ch, method, props, body):
-        logger.debug("Getting response")
-        logger.debug(f"Comparing crrelation ids: {self.correlation_id=}, {props.correlation_id}")
-        if self.correlation_id == props.correlation_id:
-            logger.debug(f"Body: {body=}")
-            self.response = body.decode("utf-8")
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+        executor.start_polling(dp)
+    
+    async def process_photo(self, message: types.Message)-> bytes:
+        image_mgr = ImageManager()
+        image_mgr.create_photo_name(message)
+        await image_mgr.download_image(message)
+        return self.send_photo_to_ascii_server(image_mgr.get_photo_name())
 
-    def call(self, image_path: str):
-        logger.debug(f"Doing call for image:{image_path=}")
-        self.response = None
-        self.correlation_id = str(uuid.uuid4())
-        self.channel.basic_publish(
-            exchange='',
-            routing_key='rpc_queue',
-            properties=pika.BasicProperties(
-                reply_to=self.callback_queue,
-                correlation_id=self.correlation_id,
-            ),
-            body=bytearray(image_path, 'utf-8')
-        )
-        self.connection.process_data_events(time_limit=None)
-        return self.response
 
+
+    def send_photo_to_ascii_server(self, photo_name: str)->bytes:
+        return self.ascii_client.call(photo_name)
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+
+tg_server = TgServer()
 
 button_help = KeyboardButton('Help')
 button_send = KeyboardButton('Send photo')
@@ -87,14 +74,35 @@ async def process_help_command(message: types.Message):
 @dp.message_handler(content_types=['photo'])
 async def process_get_photo(message: types.Message):
 
-    photo_name = '/home/dspitsyn/ascii-db/'+ str(message.chat.username)+'/'+ str(message.message_id) + '.jpg'
-    # logger.warning(f"{photo_name=}")
-    await message.photo[-1].download(photo_name)
-    ascii_client = AsciiRpcClient()
-    response_file_name = ascii_client.call(photo_name)
+    bytes_response = await tg_server.process_photo(message=message)
+
+    await bot.send_document(message.chat.id, document=('text.txt', bytes_response.encode('utf-8')))
+
+
+    # photo_name = '/home/dspitsyn/ascii-db/'+ str(message.chat.username)+'/'+ str(message.message_id) + '.jpg'
+    # # logger.warning(f"{photo_name=}")
+
+    # tg_server.process_user_account(UserId)     // process_user_account(UserId) {account_client.send(user_id)}
+
+
+    # await message.photo[-1].download(photo_name)
+    # if(account_client.check_priv_user())
+    #     ascii_client = AsciiRpcClient()
+    #     response_file_name =  ascii_client.call(photo_name)
+    # else:
+    #     send ("Pay mone!!!!!!")
+    
+
+
+
+
+    # Process_photo.process(photo_name)
+    # process (...):
+    # ....
+    # Sendphoto(...) {client.call}
+    # ....
     # logger.warning(f"ABOBA {response_file_name.encode('utf-8')=}")
 
-    await bot.send_document(message.chat.id, document=('text.txt', response_file_name.encode('utf-8')))
     # try:
     #     # with open(photo_name, "rb") as image:
     #     #     binary = enc64(image.read()) #encoding image to base64
@@ -117,4 +125,5 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.info("Bot has started")
     logger.debug("Bot has started")
-    executor.start_polling(dp)
+    tg_server.start(dp)
+    

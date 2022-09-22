@@ -2,6 +2,8 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from asyncio.log import logger
+from nis import cat
 import time
 
 from PIL import Image
@@ -65,8 +67,13 @@ def do_stuff(image_name:str):
     photo_name = image_name[image_name.rfind('/')+1:image_name.rfind('.')]
     print(f"{working_directory=}")
     print(f"{photo_name=}")
+    try:
+        image = Image.open(image_name).convert('L')
+    except:
+        error = "File do not exist"
+        print(error)
+        raise (error)
 
-    image = Image.open(image_name).convert('L')
     image_string = image_to_ascii(resize_image(image))
     pixels = len(image_string)
     ascii_image = "\n".join(image_string[i:(i+new_width)] for i in range(0, pixels, new_width))
@@ -91,7 +98,13 @@ def on_request(ch, method, props, body):
     print(f"Working on request with {props.correlation_id=}")
     image_name_binary = body
 
-    response = do_stuff(image_name_binary.decode('utf-8'))
+    try:
+        response = do_stuff(image_name_binary.decode('utf-8'))    
+    except:
+        print(f"Error:")
+        return 
+
+    
 
     # time.sleep(60)
 
