@@ -122,7 +122,7 @@ def on_request(ch, method, props, body):
 if __name__ == '__main__':
 
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='ascii-project-net'))
+        pika.ConnectionParameters(host='rabbitmq')) #ascii-project-net
 
     channel = connection.channel()
 

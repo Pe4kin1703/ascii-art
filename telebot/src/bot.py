@@ -33,7 +33,7 @@ class TgServer:
 
         self.premium_code = 'K27-clowns'
 
-        logging.config.fileConfig(fname='/home/dspitsyn/KNU/ascii-art/telebot/src/logger.conf', disable_existing_loggers=False)
+        logging.config.fileConfig(fname='/usr/src/app/src/logger.conf', disable_existing_loggers=False)
         self.logger = logging.getLogger(__name__)
         # self.accoun_client = AccountClient()
 

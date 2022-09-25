@@ -8,13 +8,13 @@ import json
 
 class UserManager(object):
     def __init__(self):
-        self.premium_user_file_path = '/home/dspitsyn/premium-users/premium-users-list'
-        self.non_premium_users_directory = '/home/dspitsyn/non_premium-users/'
+        self.premium_user_file_path = '/usr/src/app/src/premium-users-list'
+        self.non_premium_users_directory = '/usr/src/app/src/non_premium-users/'
 
         self.attempts_for_non_premium_users = 1
 
         try:
-            os.makedirs("/home/dspitsyn/premium-users/")
+            os.makedirs("/usr/src/app/src/premium-users/")
             os.makedirs(self.non_premium_users_directory)
         except Exception as e:
             print(f"{e=}")
