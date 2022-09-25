@@ -9,10 +9,11 @@ class AsciiRpcClient(object):
     def __init__(self):
         self.host = 'localhost'
 
-        self.connection = None  
+        self.connection = None
         self.channel = None
         self.response = None
         self.correlation_id = None
+        self.callback_queue = None
 
         logging.config.fileConfig(fname='logger.conf', disable_existing_loggers=False)
         self.logger = logging.getLogger(__name__)
@@ -26,10 +27,7 @@ class AsciiRpcClient(object):
 
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
-        # Here we have one consumer. 
-        # TODO try create one consumer per photo request
-        self.channel.basic_consume(queue=self.callback_queue,
-                                   on_message_callback=self.on_response)
+
         self.response = None
         self.correlation_id = None
 
@@ -41,10 +39,12 @@ class AsciiRpcClient(object):
             self.response = body.decode("utf-8")
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def call(self, image_path: str)-> bytearray:
+    def call(self, image_path: str) -> bytearray:
         self.logger.debug(f"Doing call for image:{image_path=}")
         self.response = None
         self.correlation_id = str(uuid.uuid4())
+        self.channel.basic_consume(queue=self.callback_queue,
+                                   on_message_callback=self.on_response)
         self.channel.basic_publish(
             exchange='',
             routing_key='rpc_queue',
