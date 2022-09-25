@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+  telegram-bot:
+    build: './telebot/'
+    container_name: 'telegram'
+
+  ascii-server:
+    build: './ascii-script-service/'
+    restart: on-failure
+    container_name: 'ascii-server'
+   
+
+networks:
+  default:
+    external:
+      name: ascii-project-net
