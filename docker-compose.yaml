@@ -17,6 +17,8 @@ services:
     container_name: 'ascii-server'
     depends_on:
       - rabbitmq
+    volumes:
+      - /Users/dmytrokovalenko/Documents/AsciiArt/ascii-db/:/usr/public
 
   telegram-bot:
     build: './telebot/'
@@ -25,6 +27,11 @@ services:
     depends_on:
       - rabbitmq
       - ascii-server
+    volumes:
+      - /Users/dmytrokovalenko/Documents/AsciiArt/ascii-db/:/usr/public
+
+volumes:
+  shared-volume:
 
 networks:
   default:
