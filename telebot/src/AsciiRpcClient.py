@@ -7,7 +7,7 @@ import logging.config
 class AsciiRpcClient(object):
 
     def __init__(self):
-        self.host = 'localhost'
+        self.host = 'rabbitmq'
 
         self.connection = None
         self.channel = None
@@ -15,7 +15,7 @@ class AsciiRpcClient(object):
         self.correlation_id = None
         self.callback_queue = None
 
-        logging.config.fileConfig(fname='logger.conf', disable_existing_loggers=False)
+        logging.config.fileConfig(fname='/usr/src/app/src/logger.conf', disable_existing_loggers=False)
         self.logger = logging.getLogger(__name__)
 
     def start(self):

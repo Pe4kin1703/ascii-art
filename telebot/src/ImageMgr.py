@@ -9,8 +9,9 @@ class ImageManager(object):
         self.logger = logging.getLogger(__class__.__name__)
 
     def create_photo_name(self, message: types.Message)-> str:
-        self.photo_name = '/home/dspitsyn/ascii-db/'+ str(message.chat.username)+'/'+ str(message.message_id) + '.jpg'
+        self.photo_name = '/usr/public/ascii-db/'+ str(message.chat.username)+'/'+ str(message.message_id) + '.jpg'
         return self.photo_name
+    #/home/dspitsyn/ascii-db/
 
     async def download_image(self, message: types.Message):
         self.logger.info("Dowloading image from user: ")
