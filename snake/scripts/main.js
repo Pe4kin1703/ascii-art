@@ -110,7 +110,7 @@ function refreshGame() {
 
 function drawBerry() {
 	context.beginPath();
-	context.fillStyle = "#A00034";
+	context.fillStyle = "#FF0000";
 	context.arc( berry.x + (config.sizeCell / 2 ), berry.y + (config.sizeCell / 2 ), config.sizeBerry, 0, 2 * Math.PI );
 	context.fill();
 }
