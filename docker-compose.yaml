@@ -18,7 +18,7 @@ services:
     depends_on:
       - rabbitmq
     volumes:
-      - /Users/dmytrokovalenko/Documents/AsciiArt/ascii-db/:/usr/public
+      - ~/project/ascii-db/:/usr/public
 
   telegram-bot:
     build: './telebot/'
