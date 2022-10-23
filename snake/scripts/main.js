@@ -34,7 +34,7 @@ function gameLoop() {
 	if ( ++config.step < config.maxStep) {
 		return;
 	}
-	config.step = 0;
+	config.step = 0;  
 
 	context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -42,6 +42,7 @@ function gameLoop() {
 	drawSnake();
 }
 requestAnimationFrame( gameLoop );
+
 
 function drawSnake() {
 	snake.x += snake.dx;
