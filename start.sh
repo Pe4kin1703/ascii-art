@@ -1,8 +1,8 @@
 #!/bin/bash
-docker-compose build
+sudo docker-compose build
 sleep 10s
-docker-compose up rabbitmq
+sudo docker-compose up rabbitmq
 sleep 15s
-docker-compose up ascii-server
+sudo docker-compose up ascii-server
 sleep 10s
-docker-compose up telebot
+sudo docker-compose up telebot
