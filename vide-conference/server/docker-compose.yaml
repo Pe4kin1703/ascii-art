@@ -1,0 +1,8 @@
+version: "3.3"
+services:
+  video-server:
+    build: '.'
+    restart: on-failure
+    container_name: 'video-server'
+    ports:
+      - "6666:6666"
